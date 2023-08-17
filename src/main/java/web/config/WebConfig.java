@@ -1,5 +1,6 @@
 package web.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,17 +28,18 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@EnableWebMvc
-@EnableJpaRepositories("web.repository")
 @ComponentScan("web")
 @PropertySource("classpath:db.properties")
 @EnableTransactionManagement
+@EnableJpaRepositories("web.repository")
+@EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
 
     private final Environment env;
 
+    @Autowired
     public WebConfig(ApplicationContext applicationContext, Environment env) {
         this.applicationContext = applicationContext;
         this.env = env;
@@ -48,7 +50,7 @@ public class WebConfig implements WebMvcConfigurer {
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setPrefix("/WEB-INF/users");
+        templateResolver.setPrefix("/WEB-INF/views/");
         templateResolver.setSuffix(".html");
         templateResolver.setCharacterEncoding("UTF-8");
         return templateResolver;
@@ -67,9 +69,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void configureViewResolvers(ViewResolverRegistry registry) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
         resolver.setTemplateEngine(templateEngine());
-        registry.viewResolver(resolver);
         resolver.setCharacterEncoding("UTF-8");
         resolver.setContentType("text/html; charset=UTF-8");
+
+        registry.viewResolver(resolver);
 
     }
 
@@ -110,6 +113,7 @@ public class WebConfig implements WebMvcConfigurer {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", env.getRequiredProperty("db.dialect"));
         properties.put("hibernate.show_sql", env.getRequiredProperty("db.show_sql"));
+        properties.put("hibernate.hbm2ddl.auto", env.getRequiredProperty("db.hbm2ddl.auto"));
 
         return properties;
     }

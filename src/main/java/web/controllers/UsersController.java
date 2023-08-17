@@ -24,24 +24,22 @@ public class UsersController {
     @GetMapping()
     public String index(Model model) {
 
-        model.addAttribute("users_base", userService.findAll());
+        model.addAttribute("users", userService.findAll());
         return "users/index";
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model model) {
-        model.addAttribute("user", userService.findOne((long) id));
+    public String show(@PathVariable("id") long id, Model model) {
+        model.addAttribute("users", userService.findOne(id));
         return "users/show";
     }
 
     @GetMapping("/new")
-    public String newUser(Model model) {
-        model.addAttribute("user", new User());
-
+    public String newUser(@ModelAttribute("user") User user) {
         return "users/new";
     }
 
-    @PostMapping
+    @PostMapping()
     public String create(@ModelAttribute("user") @Valid User user,
                          BindingResult bindingResult) {
         if (bindingResult.hasErrors())
@@ -52,24 +50,24 @@ public class UsersController {
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("user", userService.findOne((long) id));
+    public String edit(Model model, @PathVariable("id") long id) {
+        model.addAttribute("user", userService.findOne(id));
         return "users/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("user") @Valid User user, BindingResult bindingResult,
-                         @PathVariable("id") int id) {
+                         @PathVariable("id") long id) {
         if (bindingResult.hasErrors())
             return "users/edit";
 
-        userService.update(id, user);
+        userService.update((int) id, user);
         return "redirect:/users";
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id) {
-        userService.delete((long) id);
+    public String delete(@PathVariable("id") long id) {
+        userService.delete(id);
         return "redirect:/users";
     }
 
