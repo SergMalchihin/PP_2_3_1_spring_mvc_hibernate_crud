@@ -1,41 +1,59 @@
 package web.dao;
 
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Repository;
 import web.model.User;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.List;
 
-@Component
-@Transactional
-class UserDaoImpl implements UserDAO {
+@Repository
+public class UserDAOImpl implements UserDAO {
 
+
+    //@PersistenceContext говорит о том, что наш UserDAOImpl зависит от EntityManager, который управляет Entity-сущностями.
+    //Эта аннотация внедряет прокси, который выполняет открытие и закрытие EntityManager автоматически
     @PersistenceContext
     private EntityManager entityManager;
 
+
     @Override
     public List<User> getAllUsers() {
-        return entityManager.createQuery("select u from User u", User.class).getResultList();
+        return entityManager.createQuery("select u from User u", User.class).getResultList(); //У EntityManager свой язык запросов - JPQL
     }
 
     @Override
-    public User getUserById(long id) {
-        return entityManager.find(User.class,id);
+    public User getUserById (long id) {
+        TypedQuery<User> query = entityManager.createQuery("select u from User u where u.id = :id", User.class);
+        query.setParameter("id",id);
+        return query.getSingleResult();
+//      return query.getResultList().stream().findAny().orElse(null); //Можно так написать,чтобы обрабатывалась ситуация,
+//      когда нет id
+//      Метод findAny() возвращает первый попавшийся элемент из Stream-a, в виде обертки Optional.
     }
 
+    //Метод persist() - вводит новый экземпляр сущности в персистентный контекст, т.е. в контекст EntityManager'а
+    //Это сохранение
     @Override
     public void addUser(User user) {
         entityManager.persist(user);
+
     }
 
     @Override
-    public void removeUser(long id) {
-        entityManager.remove(getUserById(id));
+    public void delete(long id) {
+        User user = entityManager.find(User.class, id);
+        entityManager.remove(user);
     }
 
+    //updatedUser - это то, что пришло с формы редактирования юзера
     @Override
-    public void updateUser(User user) {
-        entityManager.merge(user);
+    public void updateUser (long id, User updatedUser) {
+        User user = entityManager.find(User.class, id); // по id определили, какой именно юзер был изменен и передан в аргумент
+        user.setName(updatedUser.getName()); //этому найденному юзеру устанавливаем значения того юзера, который пришел из формы
+        user.setSurname(updatedUser.getSurname());
+        user.setEmail(updatedUser.getEmail());
+        entityManager.persist(user);
     }
 }

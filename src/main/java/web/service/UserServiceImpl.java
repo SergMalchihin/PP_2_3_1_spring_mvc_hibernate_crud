@@ -1,51 +1,53 @@
 package web.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import web.dao.UserDAO;
 import web.model.User;
-import web.repository.UsersRepository;
 
-import javax.transaction.Transactional;
+
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    private final UsersRepository usersRepository;
+    private final UserDAO userDAO;
 
-    public UserServiceImpl(UsersRepository usersRepository) {
-        this.usersRepository = usersRepository;
+
+    @Autowired
+    public UserServiceImpl(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
     @Override
-    public List<User> findAll() {
-        return usersRepository.findAll();
+    public List<User> getAllUsers() {
+        return userDAO.getAllUsers();
     }
 
-    @Override
-    public User findOne(Long id) {
-        Optional<User> foundPerson = usersRepository.findById(Math.toIntExact(id));
-        return foundPerson.orElse(null);
-    }
 
-    @Transactional
     @Override
-    public void save(User user) {
-        usersRepository.save(user);
+    public User getUserById(long id) {
+        return userDAO.getUserById(id);
     }
 
     @Transactional
     @Override
-    public void update(int id, User updatedUser) {
-        updatedUser.setId(id);
-        usersRepository.save(updatedUser);
+    public void addUser(User user) {
+        userDAO.addUser(user);
     }
 
     @Transactional
     @Override
-    public void delete(Long id) {
-        usersRepository.deleteById(Math.toIntExact(id));
+    public void delete(long id) {
+        userDAO.delete(id);
+    }
+
+    @Transactional
+    @Override
+    public void updateUser (long id, User updateUser) {
+        userDAO.updateUser(id, updateUser);
     }
 }

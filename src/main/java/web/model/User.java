@@ -6,7 +6,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "users_base")
+@Table(name = "users")
 public class User {
     @Id
     @Column(name = "id")
@@ -17,7 +17,7 @@ public class User {
     @Column(name = "name")
     private String name;
     @NotEmpty(message = "Surname should not be empty.")
-    @Column(name = "last_nem")
+    @Column(name = "surname")
     private String surname;
     @NotEmpty(message = "Email should not be empty.")
     @Email(message = "Email should be valid.")
@@ -28,8 +28,7 @@ public class User {
 
     }
 
-    public User(int id, String name, String surname, String email) {
-        this.id = (long) id;
+    public User(String name, String surname, String email) {
         this.name = name;
         this.surname = surname;
         this.email = email;

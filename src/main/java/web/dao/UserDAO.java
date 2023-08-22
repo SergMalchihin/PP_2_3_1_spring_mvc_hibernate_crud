@@ -5,9 +5,11 @@ import java.util.List;
 
 public interface UserDAO {
 
-    List<User>getAllUsers ();
-    User getUserById(long id);
-    void addUser(User user);
-    void removeUser(long id);
-    void updateUser(User user);
+    List<User> getAllUsers(); // запрос select
+    User getUserById (long id);
+
+    void addUser(User user); //запрос update
+
+    void delete(long id); //запрос delete
+    void updateUser (long id, User updateUser);
 }
