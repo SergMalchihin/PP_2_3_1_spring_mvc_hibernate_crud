@@ -2,6 +2,7 @@ package web.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
@@ -12,7 +13,8 @@ public class User {
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotEmpty(message = "Name should not be empty.")
+    @NotEmpty(message = "Name should not be empty.") // https://www.baeldung.com/java-validation
+    @NotBlank // может применяться только к текстовым значениям и проверяет, что свойство не является нулевым или пробелом.
     @Size(min = 2, max = 30, message = "Name should be between 2 and 30 characters.")
     @Column(name = "name")
     private String name;

@@ -66,7 +66,12 @@ public class UsersController {
     //Здесь использован механизм redirect, который говорит браузеру перейти на какую-то другую страницу.
     //Д/этого пишем "redirect:" и после двоеточия пишем url-адрес той страницы, на которую нужно перенаправить
     @PostMapping()
-    public String addUser(@ModelAttribute("user") User user) {
+    public String addUser(@ModelAttribute("user") @Valid User user,
+                          BindingResult bindingResult) {
+        // Если ошибка валидации, то вернемся в форму заполнения во view "new"ю
+        if (bindingResult.hasErrors())
+            return "users/new";
+
         userService.addUser(user); // Добавляем этого юзера в БД
         return "redirect:/users/all";
     }
@@ -87,7 +92,11 @@ public class UsersController {
     //@PatchMapping, потому что мы вносим при этом изменения
     //Сюда придут новые данные юзера, которые хотят изменить
     @PatchMapping("/{id}")
-    public String update (@ModelAttribute ("user") User updateUser, @PathVariable ("id") long id) {
+    public String update (@ModelAttribute ("user") @Valid  User updateUser,
+                          BindingResult bindingResult, @PathVariable ("id") long id) {
+        if (bindingResult.hasErrors())
+            return "users/edit";
+
         userService.updateUser(id, updateUser); //Находим по id того юзера, которого надо изменить
         return "redirect:/users/all";
     }
